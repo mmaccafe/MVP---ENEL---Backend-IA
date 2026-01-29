@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "tipo": "evaluate",
+    "id": "avaliacao_rubrica_telemedicina",
+    "versao": "v1"
+  },
+  "blocks": {
+    "system": "Avalie o transcript de atendimento com base na rubrica fornecida. Gere saída estruturada.",
+    "policy": [
+      "Basear justificativas em evidências do transcript.",
+      "Não adicionar fatos que não estejam presentes."
+    ],
+    "outputContract": {
+      "format": "json",
+      "schemaHint": {
+        "scores": "mapa de categorias com score e justificativa",
+        "overallScore": "nota final",
+        "recommendations": "lista de recomendações"
+      }
+    }
+  }
+}

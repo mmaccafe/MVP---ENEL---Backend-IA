@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "tipo": "summarize-session",
+    "id": "resumo_sessao",
+    "versao": "v1"
+  },
+  "blocks": {
+    "system": "Gere um resumo técnico e conciso da sessão, mantendo apenas fatos relevantes, progressão e pendências.",
+    "policy": [
+      "Manter concisão.",
+      "Não inventar informações.",
+      "Priorizar itens clínicos e decisões."
+    ],
+    "outputContract": {
+      "format": "texto",
+      "tamanho_maximo": "medio"
+    }
+  }
+}
