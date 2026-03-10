@@ -1,15 +1,11 @@
-# =============================================================================
-# Arquivo: endpoints/evaluate_endpoint.py
-# Projeto: Backend de IA (MVP) - EMS GenAI
-# Endpoint:
-#   POST /v1/ai/evaluate
-# Finalidade:
-#   Avaliar uma sessão (transcript) com rubricas, retornando JSON estruturado.
-# =============================================================================
+# endpoints/evaluate_endpoint.py
+# Ajustado para usar compose_prompt do utils.prompt_utils e importar objetos Flask necessários.
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, current_app, request, jsonify
+
 from utils.prompt_repository import PromptRepository
-from utils.prompt_composer import compose_simple_prompt
+# usar o prompt_utils que você tem no repositório
+from utils.prompt_utils import compose_prompt
 from services.bedrock_runtime_service import BedrockRuntimeService
 
 evaluate_bp = Blueprint("evaluate", __name__)
@@ -40,16 +36,17 @@ def post_evaluate():
         if k not in payload:
             return jsonify({"error": f"Campo obrigatório ausente: {k}"}), 400
 
-    # Template de avaliação em arquivo (MVP)
     template_file = payload.get("templateFile", "avaliacao_rubrica_telemedicina_v1.json")
     try:
         template = _repo.load_evaluate_template(template_file)
     except FileNotFoundError as e:
         return jsonify({"error": str(e)}), 404
 
-    prompt_str = compose_simple_prompt(payload_json=payload, template_json=template)
+    # usar a função disponível compose_prompt (ajuste-se aos parâmetros que ela espera)
+    # aqui estou passando payload e template; adapte se precisar de rag_context ou extras
+    prompt_str = compose_prompt(payload_json=payload, prompt_template_json=template)
 
-    model_id = current_app.config["BEDROCK_EVALUATE_MODEL_ID"]
+    model_id = current_app.config.get("BEDROCK_EVALUATE_MODEL_ID")
     gen_cfg = payload.get("generationConfig", {})
     generation = {
         "maxOutputTokens": int(gen_cfg.get("maxOutputTokens", 1024)),

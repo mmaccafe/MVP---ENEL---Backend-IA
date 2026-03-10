@@ -1,46 +1,9 @@
 # endpoints/summarize_session_endpoint.py
-from flask import Blueprint, request, jsonify
-from utils.prompt_utils import compose_prompt
-from utils.ia_services import (
-    load_prompt_template_for_summarize,
-    call_bedrock_llm_summarize,
-)
-
-summarize_bp = Blueprint("summarize", __name__)
-
-
-@summarize_bp.route("/summarize-session", methods=["POST"])
-def handle_summarize_session():
-    """
-    Endpoint de sumarização de sessão.
-
-    Responsabilidades:
-    - Receber resumo atual + últimos turns.
-    - Carregar template de sumarização.
-    - Compor prompt com histórico condensado.
-    - Chamar LLM para gerar novo summary.
-    """
-    
-# =============================================================================
-# Arquivo: endpoints/summarize_session_endpoint.py
-# Projeto: Backend de IA (MVP) - EMS GenAI
-# Endpoint:
-#   POST /v1/ai/summarize-session
-# Finalidade:
-#   Gerar/atualizar resumo de sessão (conversationSummary) após fechamento do atendimento.
-#
-#     Responsabilidades:
-#     - Receber resumo atual + últimos turns.
-#     - Carregar template de sumarização.
-#     - Compor prompt com histórico condensado.
-#     - Chamar LLM para gerar novo summary.
-
-
-# =============================================================================
-
 from flask import Blueprint, request, jsonify, current_app
+
+# ajustar para o módulo utilitário que você realmente tem
+from utils.prompt_utils import compose_prompt
 from utils.prompt_repository import PromptRepository
-from utils.prompt_composer import compose_simple_prompt
 from services.bedrock_runtime_service import BedrockRuntimeService
 
 summarize_bp = Blueprint("summarize", __name__)
@@ -77,9 +40,11 @@ def post_summarize_session():
     except FileNotFoundError as e:
         return jsonify({"error": str(e)}), 404
 
-    prompt_str = compose_simple_prompt(payload_json=payload, template_json=template)
+    # usar a função de composição de prompt disponível no repositório
+    # (ajuste os nomes de argumentos se compose_prompt tiver assinatura diferente)
+    prompt_str = compose_prompt(payload_json=payload, prompt_template_json=template)
 
-    model_id = current_app.config["BEDROCK_SUMMARIZE_MODEL_ID"]
+    model_id = current_app.config.get("BEDROCK_SUMMARIZE_MODEL_ID")
     gen_cfg = payload.get("generationConfig", {})
     generation = {
         "maxOutputTokens": int(gen_cfg.get("maxOutputTokens", 400)),
@@ -89,7 +54,6 @@ def post_summarize_session():
 
     llm = _rt.invoke_text_model(model_id=model_id, prompt=prompt_str, generation=generation)
 
-    # Retorna texto cru (no MVP o App Backend persiste)
     return jsonify({
         "newSummaryRaw": llm.get("raw"),
         "model": llm.get("modelId", model_id)
